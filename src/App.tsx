@@ -13,6 +13,7 @@ function App() {
             <Header />
             <Route path="/" component={StartPage}/>
             <Route path="/visiting" component={Visiting}/>
+
             <Footer />
         </div>
     </Router>

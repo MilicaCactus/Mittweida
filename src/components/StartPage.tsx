@@ -1,8 +1,8 @@
 import GlobeImage from "../assets/globe.jpg";
-import CaffeeImage from "../assets/caffee.jpg";
-import Schule_mittweida from "../assets/schule_mittweida.jpg";
-import FlowersImage from "../assets/flowers.jpg";
-import Mittweida_marktplatz from "../assets/mittweida_marktplatz.jpg";
+//import CaffeeImage from "../assets/caffee.jpg";
+//import Schule_mittweida from "../assets/schule_mittweida.jpg";
+//import FlowersImage from "../assets/flowers.jpg";
+//import Mittweida_marktplatz from "../assets/mittweida_marktplatz.jpg";
 import {useEffect, useState} from "react";
 import {supabase} from "@/lib/supabase.ts";
 
