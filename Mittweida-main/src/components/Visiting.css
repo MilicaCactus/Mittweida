@@ -1,0 +1,140 @@
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: #ffffff;
+    gap: 1.5rem;
+}
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.header-left,
+.header-right {
+    width: 25%;
+    display: flex;
+    justify-content: center;
+}
+
+.title-group {
+    width: 50%;
+    text-align: center;
+}
+
+.title {
+    margin: 0;
+    font-weight: bold;
+}
+
+.subtitle {
+    margin: 0;
+    color: gray;
+}
+
+.cat-image,
+.maps-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.cat-image {
+    border-radius: 50%;
+}
+
+.maps-image {
+    border-radius: 60%;
+}
+
+.search-input {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: none;
+    background-color: #eee;
+    color: #888;
+    width: 60%;
+    max-width: 400px;
+}
+
+.visiting-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+.visiting-card {
+    position: relative;
+    width: 500px;
+    max-width: 90%;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.visiting-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.visiting-icon {
+    position: absolute;
+    z-index: 2;
+}
+.map-pin {
+    background-color: #e0e7ff;
+}
+.image-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+}
+
+.visiting-icon.top-right {
+    top: -20px;
+    right: -20px;
+}
+
+.visiting-icon.bottom-right {
+    bottom: -20px;
+    right: -20px;
+}
+
+.description-text {
+    padding: 15px;
+    display: none;
+    }
+
+.icon {
+    width: 100px;
+    height: 40px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.description-text {
+    display: none;
+    padding: 15px;
+}
+
+.description-text.show {
+    display: block;
+    overflow-y: auto;
+}
+.map {
+    width: 100%;
+    height: 400px;
+}
