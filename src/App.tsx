@@ -6,6 +6,7 @@ import StartPage from "./components/StartPage.tsx";
 import Footer from "./components/Footer.tsx";
 import Saved from "@/components/saved.tsx";
 import { Profile } from "@/components/profile.tsx";
+import Auth from "@/components/LoginComponent.tsx";
 
 function App() {
     const [location] = useLocation();
@@ -16,7 +17,7 @@ function App() {
         <Router>
             <div className="App">
                 {shouldShowHeader && <Header />}
-
+                <Auth />
                 <Route path="/" component={StartPage} />
                 <Route path="/visiting" component={Visiting} />
                 <Route path="/saved" component={Saved} />

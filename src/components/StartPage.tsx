@@ -56,7 +56,7 @@ export default function StartPage() {
                 />
             </div>
 
-            <div className="masonry-grid">
+            <div className="grid grid-cols-2 gap-1.5 p-5 w-full max-w-[1200px] mx-auto">
                 {posts.map((post, index) => (
                     <div
                         className="masonry-box"

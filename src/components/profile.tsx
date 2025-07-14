@@ -106,7 +106,7 @@ export const Profile: React.FC = () => {
             <div className="tab-content">
                 {activeTab === 'posts' && (
                     <div className="posts-section">
-                        <h3 className="center-text">Your Post’s…</h3>
+                        <h3 className="center-text">Your Posts</h3>
                         <div className="post-card"></div>
                         <div className="post-card"></div>
                         <div className="post-card"></div>
