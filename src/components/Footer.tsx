@@ -19,7 +19,7 @@ export default function Footer() {
             <div className={`nav-item ${location == "/visiting" ? "on" : ""}`} onClick={()=>onClick("/visiting")}>
                 <LocationIcon />
             </div>
-            <div className={`nav-item ${location == "/" ? "on" : ""}`}>
+            <div className={`nav-item`}>
                 <UploadDialog/>
             </div>
             <div className={`nav-item ${location == "/saved" ? "on" : ""}`} onClick={()=>onClick("/saved")}>

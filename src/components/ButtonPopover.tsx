@@ -20,9 +20,17 @@ import { Label } from "@/components/ui/label"
 import {PlusIcon} from "@/assets/Icons.tsx";
 import {useEffect, useState} from "react";
 import {supabase} from "@/lib/supabase.ts";
+import {useIsLoggedIn} from "@/components/hooks/LoginProvider.tsx";
 
 export function UploadDialog() {
     const [file, setFile] = useState<File>();
+    const [error, setError] = useState<string|null>(null);
+    const {guard} = useIsLoggedIn()
+    const [open, setOpen] = useState<boolean>(false);
+    const handleClick = guard(() => {
+        alert("openUpload");
+    });
+
     function uploadImage(){
         const input = document.createElement("input");
         input.type = "file";
@@ -32,20 +40,39 @@ export function UploadDialog() {
         input.click()
         input.multiple = false
         input.onchange = (ev) => {
+            console.log(ev.target.files[0])
+
             setFile(ev.target!.files[0])
         }
     }
-    async function onSubmit(){
+    async function onSubmit(e){
+        if (!file){
+            setError("You need to attach a file!")
+            return
+        }
+        setError(null)
+        const {data, error} = await supabase.storage.from('images').upload('file_path', new Blob([file], { type: file.type }), {
+            contentType: file.type,
+        })
+        if (error){
+            setError(error.message)
+        }
+        if (data){
+            await continueUpload(data)
+        }
+    }
+    async function continueUpload(){
 
     }
 
     return (
-        <Dialog>
+        <>
+        <div onClick={handleClick} className={"cursor-pointer"}>
+            <PlusIcon />
+        </div>
+        <Dialog open={open}>
             <form>
-                <DialogTrigger className={"cursor-pointer"}>
-                    <PlusIcon />
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Create Post</DialogTitle>
                         <DialogDescription>
@@ -71,6 +98,7 @@ export function UploadDialog() {
                                 </TabsContent>
                             </Tabs>
                         </div>
+                        {error && <span className={"text-red-400/80"}>{error}</span>}
                         <div className="grid gap-3">
                             <Label htmlFor="name-1">Title</Label>
                             <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
@@ -84,11 +112,12 @@ export function UploadDialog() {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit">Save changes</Button>
+                        <Button className={"cursor-pointer"} type={"submit"} onClick={guard(onSubmit)}>Post Post</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>
         </Dialog>
+        </>
     )
 }
 
