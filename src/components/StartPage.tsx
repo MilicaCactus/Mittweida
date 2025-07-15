@@ -18,11 +18,10 @@ export default function StartPage() {
     const [posts, setPosts] = useState([]);
     useEffect(() => {
         async function getPosts(){
-            const {data, error} = await supabase.from("posts").select("*").limit(50)
-            if (data){
-                setPosts(data)
+            const { data, error } = await supabase.from("posts").select("*").limit(50);
+            if (data) {
+                setPosts(data);
             }
-
         }
         getPosts();
     }, []);
@@ -58,7 +57,7 @@ export default function StartPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-1.5 p-5 w-full max-w-[1200px] mx-auto">
-                {posts.map((post, index) => (
+                {posts.sort((a,b)=>(new Date(b.created_at).getTime() - new Date(a.created_at).getTime())).map((post, index) => (
                     <PostComponent post={post} key={"post_"+index} index={index} visibleDescriptions={visibleDescriptions} onClick={() => toggleDescription(index)} />
                 ))}
             </div>

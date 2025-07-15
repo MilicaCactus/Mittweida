@@ -17,9 +17,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {PlusIcon} from "@/assets/Icons.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {supabase} from "@/lib/supabase.ts";
 import { useAuth } from "./hooks/LoginProvider"
+import {v4 as uuidv4} from "uuid"
 
 export function UploadDialog() {
     const [file, setFile] = useState<File>();
@@ -55,7 +56,25 @@ export function UploadDialog() {
         const {data, error} = await supabase.from("posts").insert({
             ...post,
             user_id: user!.id,
-        })
+        }).select().single()
+        if (data.id){
+            const filePath = `${data.id}`;
+            const {error: uploadError} = await supabase.storage.from("images").upload(filePath, file, {
+                contentType: file.type,
+            });
+            if (uploadError) {
+                setError(uploadError.message);
+                return;
+            }
+            const {data: imageData} = await supabase.storage.from("images").getPublicUrl(filePath);
+            if (imageData.publicUrl) {
+                await supabase.from("posts").update({image_url: imageData.publicUrl}).eq("id", data.id);
+                setPost({...post});
+            }
+            setTimeout(()=>{
+                window.location.reload();
+            }, 1000)
+        }
         // setError(null)
         // const {data, error} = await supabase.storage.from('images').upload('file_path', new Blob([file], { type: file.type }), {
         //     contentType: file.type,
@@ -100,18 +119,18 @@ export function UploadDialog() {
                                     </div>}
                                 </TabsContent>
                                 <TabsContent value="camera">
-                                    <Camera />
+                                    <Camera file={file} setFile={setFile} />
                                 </TabsContent>
                             </Tabs>
                         </div>
                         {error && <span className={"text-red-400/80"}>{error}</span>}
                         <div className="grid gap-3">
-                            <Label htmlFor="name-1">Title</Label>
-                            <Input id="name-1" name="name" value={post.title} defaultValue="Mittweida" />
+                            <Label htmlFor="title">Title</Label>
+                            <Input id="title" name="title" value={post.title} onChange={(e)=>setPost({...post, title: e.target.value})} defaultValue="Mittweida" />
                         </div>
                         <div className="grid gap-3">
-                            <Label htmlFor="username-1">Description</Label>
-                            <Input id="username-1" name="username" value={post.description} onChange={(e)=>setPost({...post, description: e.target.value})} defaultValue="@peduarte" />
+                            <Label htmlFor="desc">Description</Label>
+                            <Input id="desc" name="desc" value={post.description} onChange={(e)=>setPost({...post, description: e.target.value})} defaultValue="@peduarte" />
                         </div>
                     </div>
                     <DialogFooter>
@@ -127,79 +146,131 @@ export function UploadDialog() {
     )
 }
 
-function Camera(){
-    const [cameraAccess, setCameraAccess] = useState<boolean|null>(null)
-    function takePicture() {
-        const [width, height] = [720, 0]
-        const canvas = document.getElementById("photo") as HTMLCanvasElement
-        const context = canvas.getContext("2d")!
-        if (width && height) {
-            canvas.width = width;
-            canvas.height = height;
-            context.drawImage(video, 0, 0, width, height);
+export function Camera({ file, setFile }) {
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const streamRef = useRef<MediaStream | null>(null);
+    const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
+    const [streaming, setStreaming] = useState(false);
+    const width = 720;
 
-            const data = canvas.toDataURL("image/png");
-            console.log(data)
-        } else {
-            clearPhoto();
+    function dataURLToFile(dataUrl: string, filename: string): File {
+        const arr = dataUrl.split(",");
+        const mime = arr[0].match(/:(.*?);/)![1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        return new File([u8arr], filename, { type: mime });
+    }
+
+    async function takePicture() {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+
+        if (!video || !canvas) return;
+
+        let height = video.videoHeight / (video.videoWidth / width);
+        if (isNaN(height)) height = width / (4 / 3);
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext("2d")!;
+        context.drawImage(video, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL("image/png");
+        const file = dataURLToFile(dataUrl, "photo.png");
+
+        setFile(file);
+
+        // Stop the stream after capturing photo
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
         }
     }
-    useEffect(() => {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-            .then((stream) => {
-                setCameraAccess(true)
-                const video = document.getElementById("video")!
+
+    async function startStream() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            streamRef.current = stream;
+            setCameraAccess(true);
+            const video = videoRef.current;
+            if (video) {
                 video.srcObject = stream;
-                video.play();
-                video.addEventListener(
-                    "canplay",
-                    (ev) => {
-                        if (!streaming) {
-                            height = video.videoHeight / (video.videoWidth / width);
+                await video.play();
 
-                            // Firefox currently has a bug where the height can't be read from
-                            // the video, so we will make assumptions if this happens.
-                            if (isNaN(height)) {
-                                height = width / (4 / 3);
-                            }
+                let height = video.videoHeight / (video.videoWidth / width);
+                if (isNaN(height)) height = width / (4 / 3);
 
-                            video.setAttribute("width", width);
-                            video.setAttribute("height", height);
-                            canvas.setAttribute("width", width);
-                            canvas.setAttribute("height", height);
-                            streaming = true;
-                        }
-                    },
-                    false,
-                );
-            })
-            .catch((error) => {
-                console.log(error)
-                if (error.name === 'NotAllowedError'){
-                    setCameraAccess(false)
-                }
-            });
+                video.setAttribute("width", `${width}`);
+                video.setAttribute("height", `${height}`);
+                canvasRef.current?.setAttribute("width", `${width}`);
+                canvasRef.current?.setAttribute("height", `${height}`);
+
+                setStreaming(true);
+            }
+        } catch (error: any) {
+            console.error(error);
+            if (error.name === "NotAllowedError") {
+                setCameraAccess(false);
+            }
+        }
+    }
+
+    useEffect(() => {
+        startStream();
+
+        return () => {
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach((track) => track.stop());
+            }
+        };
     }, []);
-    if (cameraAccess === null) return (
-        <div className="bg-gray-100 relative min-h-24 rounded-md">
-            <span className="absolute h-fit w-fit text-black/60 right-0 left-0 top-0 bottom-0 m-auto">
-            Requesting camera permission...
-                </span>
-        </div>
-    );
-    if (cameraAccess === false) return (
-        <div className="bg-gray-100 relative min-h-24 rounded-md">
-            <span className="absolute h-fit w-fit text-black/60 right-0 left-0 top-0 bottom-0 m-auto">
-                You have not given permission for the camera.
-            </span>
-        </div>
-    );
-    if (cameraAccess === true) return (
-        <div>
-            <canvas id="photo"></canvas>
-            <video id="video">Video stream not available.</video>
-            <Button onClick={takePicture}>Take a Photo</Button>
-        </div>
-    );
 
+    function handleClear() {
+        setFile(null);
+        startStream(); // restart stream when clearing the photo
+    }
+
+    if (cameraAccess === null)
+        return (
+            <div className="bg-gray-100 relative min-h-24 rounded-md">
+                <span className="absolute h-fit w-fit text-black/60 right-0 left-0 top-0 bottom-0 m-auto">
+                    Requesting camera permission...
+                </span>
+            </div>
+        );
+
+    if (cameraAccess === false)
+        return (
+            <div className="bg-gray-100 relative min-h-24 rounded-md">
+                <span className="absolute h-fit w-fit text-black/60 right-0 left-0 top-0 bottom-0 m-auto">
+                    You have not given permission for the camera.
+                </span>
+            </div>
+        );
+
+    return (
+        <div className="flex flex-col items-center">
+            <canvas ref={canvasRef} className="hidden" />
+            {file ? (
+                <img
+                    className="rounded-sm mb-2"
+                    src={URL.createObjectURL(file)}
+                    alt="Captured"
+                />
+            ) : (
+                <video className="rounded-sm mb-2" ref={videoRef}>
+                    Video stream not available.
+                </video>
+            )}
+            {file ? (
+                <Button onClick={handleClear}>Clear Photo</Button>
+            ) : (
+                <Button onClick={takePicture}>Take a Photo</Button>
+            )}
+        </div>
+    );
 }

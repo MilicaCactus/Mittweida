@@ -10,16 +10,17 @@ import {supabase} from "@/lib/supabase.ts";
 
 export type MarkerProps = [number, number][]
 
-export function CurrentLocationMap({markers, routing=false} : {markers : MarkerProps, routing : boolean}) {
+export function CurrentLocationMap({markers, routing=false} : {markers? : MarkerProps, routing : boolean}) {
     const { location, error } = useUserLocation();
     const [places, setPlaces] = useState([]);
     useEffect(() => {
         async function getPosts(){
             const {data: places, error : error} = await supabase.from("locations").select("*")
             if (places){
-                setPlaces(places)
+                setPlaces(places.map((place) => {
+                    return [place.lat, place.long] as MarkerProps
+                }))
             }
-            console.log(places.map((i)=>new LatLng(i.lat, i.long)))
         }
         if (markers){
             console.log(markers)
@@ -41,8 +42,8 @@ export function CurrentLocationMap({markers, routing=false} : {markers : MarkerP
                 <RoutingMachine
                     waypoints={[[50.98742896250741, 12.960397827963215], ...places]}
                 />
-                : places.map((i) => [i.lat, i.long]).map((place)=>{
-                    return (<Marker position={[place[0],place[1]]} />)
+                : places.map((i) => new LatLng(i.lat, i.long)).map((place)=>{
+                    return (<Marker position={[place.lat,place.lng]} />)
                 })
             }
         </MapContainer>
@@ -53,8 +54,15 @@ function RoutingMachine({waypoints}: {waypoints: MarkerProps}) {
    const map = useMap()
     useEffect(() => {
         if (!map) return
-        const control = (L.Routing).control({
-            waypoints: waypoints.map((waypoint) => (new LatLng(waypoint[0], waypoint[1])))
+        const control = (L.Routing as L).control({
+            waypoints: waypoints.map((waypoint) => (new LatLng(waypoint[0], waypoint[1]))),
+            routeWhileDragging: false,
+            show: false,
+            addWaypoints: false,
+            waypointMode: "connect",
+            draggableWaypoints: false,
+            fitSelectedRoutes: true,
+            showAlternatives: true,
         }).addTo(map);
     }, [map]);
    return null

@@ -6,7 +6,7 @@ export default function MapPopover({markers, open, setOpen} : {markers : MarkerP
     return (
         <Dialog open={open} onOpenChange={(e)=>setOpen(e)}>
             <DialogContent>
-                <CurrentLocationMap markers={[markers]} routing={true} />
+                <CurrentLocationMap routing={true} />
             </DialogContent>
         </Dialog>
     )
