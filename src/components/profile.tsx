@@ -81,7 +81,14 @@ export const Profile: React.FC = () => {
         setNotes(updated);
         localStorage.setItem('notes', JSON.stringify(updated));
     };
-
+    const [visibleDescriptions, setVisibleDescriptions] = useState<boolean[]>(
+        Array(posts.length).fill(false)
+    );
+    const toggleDescription = (index: number) => {
+        const updated = [...visibleDescriptions];
+        updated[index] = !updated[index];
+        setVisibleDescriptions(updated);
+    };
     return (
         <div className="profile-wrapper">
             {/* Cover + Avatar */}
@@ -129,7 +136,16 @@ export const Profile: React.FC = () => {
                         {
                             posts.map((post, index) => {
                                 return (
-                                    <PostComponent post={post} key={index} index={index} visibleDescriptions={Array(posts.length).fill(false)} onClick={() => {}} />
+                                    <div className="relative">
+                                        <PostComponent post={post} key={index} index={index} visibleDescriptions={visibleDescriptions} onClick={() => toggleDescription(index)} />
+                                        <div className="visiting-icon top-right cursor-pointer" onClick={() => {
+                                            supabase.from("posts").delete().eq("id", post.id).then(() => {
+                                                setPosts((prev) => prev.filter((p) => p.id !== post.id));
+                                            });
+                                        }}>
+                                            <div className="icon map-pin">🗑️</div>
+                                        </div>
+                                    </div>
                                 );
                             })
                         }
