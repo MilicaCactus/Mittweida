@@ -2,14 +2,32 @@ import React, { useState, useEffect } from 'react';
 import './Profile.css';
 import CatImage from "../assets/Cat.jpg";
 import Saved from './saved';
+import { useAuth } from './hooks/LoginProvider';
+import { supabase } from '@/lib/supabase';
+import PostComponent from './PostComponent';
 
 export const Profile: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'notebook'>('posts');
 
-    // Editable bio state
+    const {user, guard} = useAuth();
     const [bio, setBio] = useState('');
     const [editingBio, setEditingBio] = useState(false);
-
+    const [posts, setPosts] = useState<any[]>([]);
+    useEffect(() => {
+        
+        async function fetchPosts() {
+            if (!user) await fetchPosts();
+            const {data, error} = await supabase.from("posts").select("*").eq("user_id", user!.id);
+            if (data) {
+                setPosts(data);
+            } else {
+                console.error("Error fetching posts:", error);
+            }
+        }
+        guard(async()=>{
+            await fetchPosts();
+        })();
+    }, [user]);
     useEffect(() => {
         const storedBio = localStorage.getItem('bio');
         if (storedBio) setBio(storedBio);
@@ -106,10 +124,15 @@ export const Profile: React.FC = () => {
             <div className="tab-content">
                 {activeTab === 'posts' && (
                     <div className="posts-section">
-                        <h3 className="center-text">Your Posts</h3>
-                        <div className="post-card"></div>
-                        <div className="post-card"></div>
-                        <div className="post-card"></div>
+                        <h3 className="center-text font-medium">Your Posts</h3>
+                        {posts.length === 0 && <p className="center-text text-sm font-light">No posts yet.</p>}
+                        {
+                            posts.map((post, index) => {
+                                return (
+                                    <PostComponent post={post} key={index} index={index} visibleDescriptions={Array(posts.length).fill(false)} onClick={() => {}} />
+                                );
+                            })
+                        }
                     </div>
                 )}
 

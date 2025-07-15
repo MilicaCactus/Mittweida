@@ -1,15 +1,17 @@
 import { useLocation } from "wouter"
-import {BookmarkIcon, FlameIcon, LocationIcon, PlusIcon, UserIcon} from "../assets/Icons.tsx";
+import {BookmarkIcon, FlameIcon, LocationIcon, UserIcon} from "../assets/Icons.tsx";
 import "./Header.css"
-import {UploadDialog} from "../components/ButtonPopover.tsx";
+import { UploadDialog } from "../components/ButtonPopover.tsx";
+import { useAuth } from "./hooks/LoginProvider.tsx";
 
 export default function Footer() {
     const [location, setLocation] = useLocation();
+    const {guard} = useAuth();
     function onClick(path : string){
         if (path == location){
             return
         }
-        setLocation(path);
+        setLocation(path)
     }
     return (
         <footer className="bottom-nav">
@@ -25,7 +27,7 @@ export default function Footer() {
             <div className={`nav-item ${location == "/saved" ? "on" : ""}`} onClick={()=>onClick("/saved")}>
                 <BookmarkIcon />
             </div>
-            <div className={`nav-item ${location == "/profile" ? "on" : ""}`} onClick={()=>onClick("/profile")}>
+            <div className={`nav-item ${location == "/profile" ? "on" : ""}`} onClick={guard(()=>onClick("/profile"))}>
                 <UserIcon />
             </div>
         </footer>

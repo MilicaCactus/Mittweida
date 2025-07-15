@@ -3,12 +3,12 @@ import {supabase} from "../lib/supabase.ts"
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {DialogContent, DialogTitle, DialogHeader, Dialog} from "@/components/ui/dialog.tsx";
-import {useIsLoggedIn} from "@/components/hooks/LoginProvider.tsx";
+import {useAuth} from "@/components/hooks/LoginProvider.tsx";
 
 export default function Auth() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {openAuth} = useIsLoggedIn()
+    const {openAuth, setOpenAuth} = useAuth()
     useEffect(() => {
         console.log(openAuth?.open)
     }, [openAuth]);
@@ -31,12 +31,16 @@ export default function Auth() {
         });
         if (error) alert(error.message);
         else {
-
+            setOpenAuth((prev)=> ({ ...prev, open: false }));
+            setTimeout(() => {
+                openAuth?.fn?.();
+                setOpenAuth(null);
+            }, 1000);
         }
     };
 
     return (
-        <Dialog open={!!(openAuth?.fn)}>
+        <Dialog open={openAuth?.open}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Login</DialogTitle>

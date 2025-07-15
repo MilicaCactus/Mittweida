@@ -7,7 +7,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import {
     Tabs,
@@ -20,15 +19,20 @@ import { Label } from "@/components/ui/label"
 import {PlusIcon} from "@/assets/Icons.tsx";
 import {useEffect, useState} from "react";
 import {supabase} from "@/lib/supabase.ts";
-import {useIsLoggedIn} from "@/components/hooks/LoginProvider.tsx";
+import { useAuth } from "./hooks/LoginProvider"
 
 export function UploadDialog() {
     const [file, setFile] = useState<File>();
     const [error, setError] = useState<string|null>(null);
-    const {guard} = useIsLoggedIn()
+    const {guard, user} = useAuth();
     const [open, setOpen] = useState<boolean>(false);
+    const [post, setPost] = useState({
+        title: "",
+        description: "",
+        image_url: null,
+    })
     const handleClick = guard(() => {
-        alert("openUpload");
+        setOpen(true);
     });
 
     function uploadImage(){
@@ -40,8 +44,6 @@ export function UploadDialog() {
         input.click()
         input.multiple = false
         input.onchange = (ev) => {
-            console.log(ev.target.files[0])
-
             setFile(ev.target!.files[0])
         }
     }
@@ -50,16 +52,20 @@ export function UploadDialog() {
             setError("You need to attach a file!")
             return
         }
-        setError(null)
-        const {data, error} = await supabase.storage.from('images').upload('file_path', new Blob([file], { type: file.type }), {
-            contentType: file.type,
+        const {data, error} = await supabase.from("posts").insert({
+            ...post,
+            user_id: user!.id,
         })
-        if (error){
-            setError(error.message)
-        }
-        if (data){
-            await continueUpload(data)
-        }
+        // setError(null)
+        // const {data, error} = await supabase.storage.from('images').upload('file_path', new Blob([file], { type: file.type }), {
+        //     contentType: file.type,
+        // })
+        // if (error){
+        //     setError(error.message)
+        // }
+        // if (data){
+        //     await continueUpload(data)
+        // }
     }
     async function continueUpload(){
 
@@ -70,7 +76,7 @@ export function UploadDialog() {
         <div onClick={handleClick} className={"cursor-pointer"}>
             <PlusIcon />
         </div>
-        <Dialog open={open}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <form>
                 <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
@@ -101,18 +107,18 @@ export function UploadDialog() {
                         {error && <span className={"text-red-400/80"}>{error}</span>}
                         <div className="grid gap-3">
                             <Label htmlFor="name-1">Title</Label>
-                            <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+                            <Input id="name-1" name="name" value={post.title} defaultValue="Mittweida" />
                         </div>
                         <div className="grid gap-3">
                             <Label htmlFor="username-1">Description</Label>
-                            <Input id="username-1" name="username" defaultValue="@peduarte" />
+                            <Input id="username-1" name="username" value={post.description} onChange={(e)=>setPost({...post, description: e.target.value})} defaultValue="@peduarte" />
                         </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button className={"cursor-pointer"} type={"submit"} onClick={guard(onSubmit)}>Post Post</Button>
+                        <Button className={"cursor-pointer"} type={"submit"} onClick={guard(onSubmit)}>Post</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>

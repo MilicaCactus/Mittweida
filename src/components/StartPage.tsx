@@ -5,6 +5,7 @@ import GlobeImage from "../assets/globe.jpg";
 //import Mittweida_marktplatz from "../assets/mittweida_marktplatz.jpg";
 import {useEffect, useState} from "react";
 import {supabase} from "@/lib/supabase.ts";
+import PostComponent from "./PostComponent";
 
 
 export default function StartPage() {
@@ -47,33 +48,18 @@ export default function StartPage() {
                     <span>Mitmachen</span>
                     <span>Mitlaufen</span>
                 </div>
-                <input
+                {/* <input
                     type="text"
                     className="search-input"
                     placeholder="Search Button..."
                     disabled
 
-                />
+                /> */}
             </div>
 
             <div className="grid grid-cols-2 gap-1.5 p-5 w-full max-w-[1200px] mx-auto">
                 {posts.map((post, index) => (
-                    <div
-                        className="masonry-box"
-                        key={"masonry"+index}
-                        onClick={() => toggleDescription(index)}
-                    >
-                        <img
-                            src={post.image_url}
-                            alt={`Gallery ${index}`}
-                            className="caffee-image"
-                            style={{ height: `${150 + (index % 3) * 40}px` }}
-                        />
-                        <h2>{post.title}</h2>
-                        <p className={`description-text ${visibleDescriptions[index] ? "show" : ""}`}>
-                            {post.description}
-                        </p>
-                    </div>
+                    <PostComponent post={post} key={"post_"+index} index={index} visibleDescriptions={visibleDescriptions} onClick={() => toggleDescription(index)} />
                 ))}
             </div>
         </>

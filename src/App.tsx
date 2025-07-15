@@ -7,12 +7,14 @@ import Footer from "./components/Footer.tsx";
 import Saved from "@/components/saved.tsx";
 import { Profile } from "@/components/profile.tsx";
 import Auth from "@/components/LoginComponent.tsx";
+import { useAuth } from './components/hooks/LoginProvider.tsx';
 
 function App() {
     const [location] = useLocation();
     const hideHeaderOn: string[] = ['/profile'];
     const shouldShowHeader: boolean = !hideHeaderOn.includes(location);
-
+    const { authReady, isLoggedIn, guard } = useAuth();
+    if (!authReady) return <></>;
     return (
         <Router>
             <div className="App">

@@ -73,7 +73,7 @@ const Visiting = () => {
                             Directions to {places.find((place)=>place.id == mapOpen)!.place_name}
                         </DialogTitle>
                     </DialogHeader>
-                    <CurrentLocationMap markers={[[places.find((place)=>place.id == mapOpen)!.lat, places.find((place)=>place.id == mapOpen)!.long]]} />
+                    <CurrentLocationMap routing={true} markers={[places.find((place)=>place.id == mapOpen)!.lat, places.find((place)=>place.id == mapOpen)!.long]} />
                 </DialogContent>)}
             </Dialog>
             {places.map((place, index) => (

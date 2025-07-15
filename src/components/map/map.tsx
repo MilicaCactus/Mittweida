@@ -21,7 +21,14 @@ export function CurrentLocationMap({markers, routing=false} : {markers : MarkerP
             }
             console.log(places.map((i)=>new LatLng(i.lat, i.long)))
         }
-        getPosts();
+        if (markers){
+            console.log(markers)
+            setPlaces([markers])
+        }
+        else { 
+            getPosts();
+        }
+
     }, []);
     if (places.length == 0) return <></>
     return (
@@ -32,7 +39,7 @@ export function CurrentLocationMap({markers, routing=false} : {markers : MarkerP
             />
             { routing ?
                 <RoutingMachine
-                    waypoints={[[50.98742896250741, 12.960397827963215], ...places.map((i) => [i.lat, i.long])]}
+                    waypoints={[[50.98742896250741, 12.960397827963215], ...places]}
                 />
                 : places.map((i) => [i.lat, i.long]).map((place)=>{
                     return (<Marker position={[place[0],place[1]]} />)
@@ -47,7 +54,6 @@ function RoutingMachine({waypoints}: {waypoints: MarkerProps}) {
     useEffect(() => {
         if (!map) return
         const control = (L.Routing).control({
-
             waypoints: waypoints.map((waypoint) => (new LatLng(waypoint[0], waypoint[1])))
         }).addTo(map);
     }, [map]);
