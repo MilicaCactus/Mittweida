@@ -12,7 +12,7 @@ plugins: [react(), tailwindcss()],  base: '/Mittweida',
     },
   },
   build: {
-    outDir: 'build'
+    outDir: 'docs'
   },
   test: {
     globals: true,
