@@ -39,7 +39,7 @@ export const Profile: React.FC = () => {
     };
 
     // Notebook state
-    const [notes, setNotes] = useState<any[]>([]);
+    const [notes, setNotes] = useState<unknown[]>([]);
     const [form, setForm] = useState({ title: '', description: '', location: '', date: '' });
     const [editingNoteIndex, setEditingNoteIndex] = useState<number | null>(null);
     const [editForm, setEditForm] = useState({ title: '', description: '', location: '', date: '' });
