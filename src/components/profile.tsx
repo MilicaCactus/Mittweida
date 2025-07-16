@@ -3,31 +3,43 @@ import './profile.css';
 import CatImage from "../assets/Cat.jpg";
 import Saved from './saved';
 import { useAuth } from './hooks/LoginProvider';
-import { supabase } from '@/lib/supabase';
 import PostComponent from './PostComponent';
 
 export const Profile: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'notebook'>('posts');
-
     const {user, guard} = useAuth();
     const [bio, setBio] = useState('');
     const [editingBio, setEditingBio] = useState(false);
-    const [posts, setPosts] = useState<any[]>([]);
+    const [posts, setPosts] = useState<{
+        id: string;
+        image_url: string;
+        title: string;
+        description: string;
+    }[]>([]);
     useEffect(() => {
 
         async function fetchPosts() {
             if (!user) await fetchPosts();
-            const {data, error} = await supabase.from("posts").select("*").eq("user_id", user!.id);
-            if (data) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/posts?user_id=eq.${user!.id}`, {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching posts: ${response.statusText}`);
+                }
+
+                const data = await response.json();
                 setPosts(data);
-            } else {
+            } catch (error) {
                 console.error("Error fetching posts:", error);
             }
         }
         guard(async()=>{
             await fetchPosts();
         })();
-    }, [user]);
+    }, [guard, user]);
     useEffect(() => {
         const storedBio = localStorage.getItem('bio');
         if (storedBio) setBio(storedBio);
@@ -38,8 +50,8 @@ export const Profile: React.FC = () => {
         setEditingBio(false);
     };
 
-    // Notebook state
-    const [notes, setNotes] = useState<unknown[]>([]);
+
+    const [notes, setNotes] = useState<{title: string, description: string, location: string, date: string}[]>([]);
     const [form, setForm] = useState({ title: '', description: '', location: '', date: '' });
     const [editingNoteIndex, setEditingNoteIndex] = useState<number | null>(null);
     const [editForm, setEditForm] = useState({ title: '', description: '', location: '', date: '' });
@@ -49,6 +61,19 @@ export const Profile: React.FC = () => {
         if (stored) setNotes(JSON.parse(stored));
     }, []);
 
+    const deletePost = async (postId: string) => {
+        await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}` // If authentication is required
+            },
+            body: JSON.stringify({
+                id: postId
+            })
+        });
+        setPosts((prev) => prev.filter((p) => p.id !== postId));
+    }
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -138,11 +163,7 @@ export const Profile: React.FC = () => {
                                 return (
                                     <div className="relative">
                                         <PostComponent post={post} key={index} index={index} visibleDescriptions={visibleDescriptions} onClick={() => toggleDescription(index)} />
-                                        <div className="visiting-icon top-right cursor-pointer" onClick={() => {
-                                            supabase.from("posts").delete().eq("id", post.id).then(() => {
-                                                setPosts((prev) => prev.filter((p) => p.id !== post.id));
-                                            });
-                                        }}>
+                                        <div className="visiting-icon top-right cursor-pointer" onClick={async()=>await deletePost(post.id)}>
                                             <div className="icon map-pin">🗑️</div>
                                         </div>
                                     </div>

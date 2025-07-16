@@ -1,5 +1,11 @@
 
-export default function PostComponent({ post, onClick, index, visibleDescriptions }: { post: any, onClick: () => void, index: number, visibleDescriptions: boolean[] }) {
+type Post = {
+    image_url: string;
+    title: string;
+    description: string;
+};
+
+export default function PostComponent({ post, onClick, index, visibleDescriptions }: { post: Post, onClick: () => void, index: number, visibleDescriptions: boolean[] }) {
     return (
         <div
             className="masonry-box"

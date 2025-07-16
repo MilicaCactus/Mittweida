@@ -19,7 +19,7 @@ const Header = () => {
     })
     return (
         <>
-            <MapPopover open={open} setOpen={setOpen} markers={[]} />
+            <MapPopover open={open} setOpen={setOpen} />
             <header className="header">
                 {user.isLoggedIn ? 
                     <div className="cursor-pointer" onClick={()=>{navigate("/profile")}}>

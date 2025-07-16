@@ -4,11 +4,10 @@ import "leaflet/dist/leaflet.css"
 import {twMerge} from "tailwind-merge";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {CurrentLocationMap} from "@/components/map/map.tsx";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 
 const Visiting = () => {
-    const [posts, setPosts] = useState([]);
     const [visibleDescriptions, setVisibleDescriptions] = useState<boolean[]>([]);
     const [places, setPlaces] = useState([]);
     const [saved, setSaved] = useState([]);
@@ -31,11 +30,10 @@ const Visiting = () => {
     }, [saved]);
     useEffect(() => {
         async function getPosts(){
-            const {data, error} = await supabase.from("posts").select("*").limit(50)
-            const {data: places, error : error1} = await supabase.from("locations").select("*")
-            if (data){
-                setPosts(data)
-            }
+            // const {data} = await supabase.from("posts").select("*").limit(50)
+            const request = await fetch(`${import.meta.env.VITE_API_URL}/locations`)
+            const places = await request.json()
+            
             if (places){
                 setPlaces(places)
             }

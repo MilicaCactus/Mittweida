@@ -3,7 +3,7 @@ import {supabase} from "@/lib/supabase.ts";
 import {twMerge} from "tailwind-merge";
 
 export default function Saved() {
-    const [posts, setPosts] = useState([]);
+    // Removed unused posts state
     const [visibleDescriptions, setVisibleDescriptions] = useState<boolean[]>([]);
     const [places, setPlaces] = useState([]);
     const [saved, setSaved] = useState(null);
@@ -24,17 +24,17 @@ export default function Saved() {
         }
     }, [saved]);
     useEffect(() => {
-            async function getPosts(){
-                const {data, error} = await supabase.from("posts").select("*").limit(50)
-                const {data: places, error : error1} = await supabase.from("locations").select("*")
-                if (data){
-                    setPosts(data)
-                }
+            async function getPlaces(){
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/locations`, {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'},
+                });
+                const places = await response.json();
                 if (places){
                     setPlaces(places)
                 }
             }
-            getPosts();
+            getPlaces();
     }, []);
     const toggleDescription = (index: number) => {
         const updated = [...visibleDescriptions];

@@ -20,13 +20,13 @@ import {PlusIcon} from "@/assets/Icons.tsx";
 import {useEffect, useRef, useState} from "react";
 import {supabase} from "@/lib/supabase.ts";
 import { useAuth } from "./hooks/LoginProvider"
-import {v4 as uuidv4} from "uuid"
 
 export function UploadDialog() {
     const [file, setFile] = useState<File>();
     const [error, setError] = useState<string|null>(null);
     const {guard, user} = useAuth();
     const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [post, setPost] = useState({
         title: "",
         description: "",
@@ -45,17 +45,39 @@ export function UploadDialog() {
         input.click()
         input.multiple = false
         input.onchange = (ev) => {
-        }
+            const target = ev.target as HTMLInputElement;
+            if (target.files && target.files[0]) {
+                setFile(target.files[0]);
+            }
+        };
     }
     async function onSubmit(e){
+        e.preventDefault?.();
         if (!file){
             setError("You need to attach a file!")
-            return
+            return;
         }
-        const {data, error} = await supabase.from("posts").insert({
-            ...post,
-            user_id: user!.id,
-        }).select().single()
+        setLoading(true);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+                ...post,
+                user_id: user!.id
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(`Error inserting post: ${error.message}`);
+        }
+        const data = await response.json()[0];
+        if (error){
+            console.log(error)
+        }
         if (data.id){
             const filePath = `${data.id}`;
             const {error: uploadError} = await supabase.storage.from("images").upload(filePath, file, {
@@ -63,31 +85,25 @@ export function UploadDialog() {
             });
             if (uploadError) {
                 setError(uploadError.message);
+                setLoading(false);
                 return;
             }
-            const {data: imageData} = await supabase.storage.from("images").getPublicUrl(filePath);
+            const {data: imageData} = supabase.storage.from("images").getPublicUrl(filePath);
             if (imageData.publicUrl) {
                 await supabase.from("posts").update({image_url: imageData.publicUrl}).eq("id", data.id);
                 setPost({...post});
             }
             setTimeout(()=>{
                 window.location.reload();
-            }, 1000)
+                setLoading(false);
+            }, 2000);
+            return;
         }
-        // setError(null)
-        // const {data, error} = await supabase.storage.from('images').upload('file_path', new Blob([file], { type: file.type }), {
-        //     contentType: file.type,
-        // })
-        // if (error){
-        //     setError(error.message)
-        // }
-        // if (data){
-        //     await continueUpload(data)
-        // }
+        setLoading(false);
     }
-    async function continueUpload(){
-
-    }
+    useEffect(() => {
+        console.log(file)
+    }, [file]);
 
     return (
         <>
@@ -136,7 +152,7 @@ export function UploadDialog() {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button className={"cursor-pointer"} type={"submit"} onClick={guard(onSubmit)}>Post</Button>
+                        <Button className={loading ? "cursor-wait"  : "cursor-pointer"} type={"submit"} onClick={guard(onSubmit)}>{loading ? "Posting..." : "Post"}</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>
@@ -150,7 +166,7 @@ export function Camera({ file, setFile }) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
-    const [streaming, setStreaming] = useState(false);
+    const [, setStreaming] = useState(false);
     const width = 720;
 
     function dataURLToFile(dataUrl: string, filename: string): File {
@@ -210,7 +226,7 @@ export function Camera({ file, setFile }) {
 
                 setStreaming(true);
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
             if (error.name === "NotAllowedError") {
                 setCameraAccess(false);

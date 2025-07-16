@@ -13,10 +13,10 @@ function App() {
     const [location] = useLocation();
     const hideHeaderOn: string[] = ['/profile'];
     const shouldShowHeader: boolean = !hideHeaderOn.includes(location);
-    const { authReady, isLoggedIn, guard } = useAuth();
+    const { authReady } = useAuth();
     if (!authReady) return <></>;
     return (
-        <Router>
+        <Router base={"/mittweida"}>
             <div className="App">
                 {shouldShowHeader && <Header />}
                 <Auth />
@@ -24,7 +24,6 @@ function App() {
                 <Route path="/visiting" component={Visiting} />
                 <Route path="/saved" component={Saved} />
                 <Route path="/profile" component={Profile} />
-
                 <Footer />
             </div>
         </Router>

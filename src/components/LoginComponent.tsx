@@ -40,7 +40,9 @@ export default function Auth() {
     };
 
     return (
-        <Dialog open={openAuth?.open}>
+        <Dialog open={openAuth?.open} onOpenChange={(open)=>{
+            setOpenAuth((prev) => ({ ...prev, open }));
+        }}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Login</DialogTitle>

@@ -1,13 +1,11 @@
-/* ---------- Wrapper ---------- */
 .profile-wrapper {
     font-family: 'Jost', sans-serif;
     max-width: 500px;
     margin: 0 auto;
     text-align: center;
-    padding-bottom: 5rem; /* bottom spacing for mobile safety */
+    padding-bottom: 5rem; 
 }
 
-/* ---------- Cover + Avatar ---------- */
 .cover-section {
     background-color: #a29761;
     height: 200px;
@@ -41,7 +39,6 @@
     border-radius: 50%;
 }
 
-/* ---------- Name & Bio ---------- */
 .name {
     margin-top: 50px;
     font-size: 1.4rem;
@@ -86,7 +83,6 @@
     cursor: pointer;
 }
 
-/* ---------- Tabs ---------- */
 .tab-icons {
     display: flex;
     justify-content: center;
@@ -106,7 +102,6 @@
     transform: scale(1.1);
 }
 
-/* ---------- Posts ---------- */
 .posts-section {
     width: 90%;
     margin: 2rem auto;
@@ -126,7 +121,6 @@
     margin-bottom: 1rem;
 }
 
-/* ---------- Notebook ---------- */
 .notebook-heading {
     margin-top: 2rem;
     margin-bottom: 1rem;
@@ -134,7 +128,6 @@
     color: #333;
 }
 
-/* New Note Form */
 .note-form {
     display: flex;
     flex-direction: column;
@@ -163,7 +156,6 @@
     cursor: pointer;
 }
 
-/* Notes List */
 .note-list {
     margin-top: 1rem;
     display: flex;
@@ -199,7 +191,6 @@
     color: #777;
 }
 
-/* Edit Mode Inputs */
 .note-card input,
 .note-card textarea {
     width: 100%;
@@ -211,7 +202,6 @@
     font-size: 1rem;
 }
 
-/* Note Action Buttons */
 .note-actions {
     display: flex;
     gap: 0.8rem;
