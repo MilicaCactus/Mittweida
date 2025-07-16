@@ -1,7 +1,5 @@
-import { supabase } from "@/lib/supabase";
 
 export default function PostComponent({ post, onClick, index, visibleDescriptions }: { post: any, onClick: () => void, index: number, visibleDescriptions: boolean[] }) {
-    console.log(supabase.storage.from("images"))
     return (
         <div
             className="masonry-box"

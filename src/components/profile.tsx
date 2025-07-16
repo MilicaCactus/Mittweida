@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Profile.css';
+import './profile.css';
 import CatImage from "../assets/Cat.jpg";
 import Saved from './saved';
 import { useAuth } from './hooks/LoginProvider';
@@ -14,7 +14,7 @@ export const Profile: React.FC = () => {
     const [editingBio, setEditingBio] = useState(false);
     const [posts, setPosts] = useState<any[]>([]);
     useEffect(() => {
-        
+
         async function fetchPosts() {
             if (!user) await fetchPosts();
             const {data, error} = await supabase.from("posts").select("*").eq("user_id", user!.id);

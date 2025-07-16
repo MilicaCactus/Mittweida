@@ -19,6 +19,7 @@ export default function StartPage() {
     useEffect(() => {
         async function getPosts(){
             const { data, error } = await supabase.from("posts").select("*").limit(50);
+            if (error) throw error;
             if (data) {
                 setPosts(data);
             }
