@@ -10,8 +10,7 @@ export default function PostComponent({ post, onClick, index, visibleDescription
                 src={post.image_url}
                 onError={(e)=>{
                     console.log(e.target)
-                    e.target.onerror=null;
-                    e.target.src=post.image_url
+                   
                 }}
                 alt={`Gallery`}
                 className="caffee-image"

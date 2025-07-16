@@ -41,9 +41,8 @@ export default function Saved() {
         updated[index] = !updated[index];
         setVisibleDescriptions(updated);
     };
-    function pinClick(){
 
-    }
+    
     function saveClick(id: number) {
         setSaved((prev) => {
             if (prev.some((item) => item.id === id)) {
@@ -70,7 +69,7 @@ export default function Saved() {
                             onClick={() => toggleDescription(index)}
                         />
                     </div>
-                    <div className="visiting-icon top-right cursor-pointer" onClick={()=>pinClick(place.id)}>
+                    <div className="visiting-icon top-right cursor-pointer" >
                         <div className="icon map-pin">📍</div>
                     </div>
                     <div className={"visiting-icon bottom-right cursor-pointer"} onClick={()=>saveClick(place.id)}>

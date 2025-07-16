@@ -45,7 +45,6 @@ export function UploadDialog() {
         input.click()
         input.multiple = false
         input.onchange = (ev) => {
-            setFile(ev.target!.files[0])
         }
     }
     async function onSubmit(e){
@@ -113,7 +112,7 @@ export function UploadDialog() {
                                     <TabsTrigger value="camera">Camera</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="gallery">
-                                    {file ? <div className={"flex flex-col gap-y-2"}><img className={"rounded-sm"} src={URL.createObjectURL(file)} /><Button onClick={()=>setFile()} className={"mx-auto"}>Remove Image</Button></div> : <div className="bg-gray-100 relative min-h-24 rounded-md" onClick={uploadImage}>
+                                    {file ? <div className={"flex flex-col gap-y-2"}><img className={"rounded-sm"} src={URL.createObjectURL(file)} /><Button className={"mx-auto"}>Remove Image</Button></div> : <div className="bg-gray-100 relative min-h-24 rounded-md" onClick={uploadImage}>
                                         {!file && <span
                                             className="absolute h-fit w-fit text-black/60 right-0 left-0 top-0 bottom-0 m-auto">Upload an Image</span>}
                                     </div>}

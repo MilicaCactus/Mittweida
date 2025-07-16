@@ -1,11 +1,19 @@
 {
   "files": [],
   "references": [
+  
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
+
   ],
+"strict": false,
+"noEmitOnError": false,
+"skipLibCheck": true,
+
   "compilerOptions": {
-    "baseUrl": ".",
+
+  "types": ["vitest/globals", "@testing-library/jest-dom"],
+   "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

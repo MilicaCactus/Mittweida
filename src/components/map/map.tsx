@@ -54,13 +54,12 @@ function RoutingMachine({waypoints}: {waypoints: MarkerProps}) {
    const map = useMap()
     useEffect(() => {
         if (!map) return
-        const control = (L.Routing as L).control({
+        const control = (L.Routing ).control({
             waypoints: waypoints.map((waypoint) => (new LatLng(waypoint[0], waypoint[1]))),
             routeWhileDragging: false,
             show: false,
             addWaypoints: false,
             waypointMode: "connect",
-            draggableWaypoints: false,
             fitSelectedRoutes: true,
             showAlternatives: true,
         }).addTo(map);
