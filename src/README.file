@@ -1,0 +1,30 @@
+Hello and welcome to my Mittweida app
+
+this app was designed for the students who are living in mittweida or are studying in mittweida.
+
+The app is inspired by pinterest, instagram and notebook.
+
+It allows users to post their blogs, posts about their day or whatever they are feeling like.
+
+The first page shows the feed of the posts that are posted by the users,
+it allows other users to read the blog and learn more about the people who live or study there
+and also informs them about Mittweida.
+//StartPage.tsx//
+
+on the nav. bar next to the feed icon is the Mittweida "places". It is showing all the most important places in Mittweida.
+It gives you a the ability to save the post for later or check out the maps and the location of the wanted
+place. You can also later on see the saved posts on the icon next to the post icon and visit the places later in case you
+dont have time to do so right now.
+//Visiting.tsx-css//
+//Saved.tsx//
+
+The app also includes a post option that allows users to actually post a blog.
+The Post includes option to write a title and description as well as to attach photos and use camera
+//PostComponent//
+ In order for users to post anything they need to be logged in or signed up with their email.
+ //LoginComponent//
+
+ The Profile page shows a profile of the user. On it the users is able to see thier things they posted as well as the things
+ they have saved and it also implements a feature that allows the user to have a small notebook on their profile page to
+ write down stuff and post it later on if they want it or just use it as a personal notebook for their personal issues.
+//profile.tsx//
